@@ -1,0 +1,1 @@
+TRUNCATE TABLE webhook_deliveries, refunds, payments, merchants RESTART IDENTITY CASCADE;
