@@ -187,6 +187,7 @@ export default function Settings() {
             <div className="space-y-2.5">
               {[
                 { event: 'payment.created', desc: 'New payment initiated' },
+                { event: 'payment.blocked', desc: 'Payment blocked by AI fraud detection' },
                 { event: 'payment.captured', desc: 'Payment successfully captured' },
                 { event: 'payment.failed', desc: 'Payment failed' },
                 { event: 'payment.refunded', desc: 'Payment fully or partially refunded' },

@@ -65,6 +65,7 @@ export async function createPayment(input: CreatePaymentInput): Promise<Payment>
   );
 
   if (risk.action === 'block') {
+    await queueWebhookDelivery(id, merchantId, 'payment.blocked', payment!);
     throw Object.assign(
       new Error(risk.reason),
       { statusCode: 422, code: 'PAYMENT_BLOCKED', payment: payment! }
