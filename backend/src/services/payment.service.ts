@@ -32,8 +32,11 @@ export interface CreatePaymentInput {
 
 export interface ListPaymentsFilter {
   status?: string;
+  risk_action?: string;
   from?: string;
   to?: string;
+  min_amount?: number;
+  max_amount?: number;
   page?: number;
   limit?: number;
 }
@@ -173,6 +176,10 @@ export async function listPayments(
     conditions.push(`status = $${idx++}`);
     params.push(filters.status);
   }
+  if (filters.risk_action) {
+    conditions.push(`risk_action = $${idx++}`);
+    params.push(filters.risk_action);
+  }
   if (filters.from) {
     conditions.push(`created_at >= $${idx++}`);
     params.push(filters.from);
@@ -180,6 +187,14 @@ export async function listPayments(
   if (filters.to) {
     conditions.push(`created_at <= $${idx++}`);
     params.push(filters.to);
+  }
+  if (filters.min_amount) {
+    conditions.push(`amount >= $${idx++}`);
+    params.push(filters.min_amount);
+  }
+  if (filters.max_amount) {
+    conditions.push(`amount <= $${idx++}`);
+    params.push(filters.max_amount);
   }
 
   const where = conditions.join(' AND ');

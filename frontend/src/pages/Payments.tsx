@@ -359,7 +359,14 @@ export default function Payments() {
       const { data } = await api.post('/analytics/nl-query', { q: nlQuery.trim() });
       setPayments(data.payments); setTotal(data.total); setNlApplied(true);
       const f = data.filters as any;
-      const parts = [f.status && `status: ${f.status}`, f.from && `from: ${f.from}`, f.to && `to: ${f.to}`].filter(Boolean);
+      const parts = [
+        f.status && `status: ${f.status}`,
+        f.risk_action && `risk: ${f.risk_action}`,
+        f.from && `from: ${f.from}`,
+        f.to && `to: ${f.to}`,
+        f.min_amount && `min: ₹${f.min_amount / 100}`,
+        f.max_amount && `max: ₹${f.max_amount / 100}`,
+      ].filter(Boolean);
       setNlDesc(parts.join(' · ') || 'all payments');
     } catch { setNlError('AI query failed — use manual filters.'); }
     finally { setNlLoading(false); }

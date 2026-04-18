@@ -82,6 +82,7 @@ export async function assessFraudRisk(
 
 export interface NLQueryParams {
   status?: string;
+  risk_action?: string;
   from?: string;
   to?: string;
   min_amount?: number;
@@ -96,8 +97,14 @@ export async function nlToQueryParams(query: string, today: string): Promise<NLQ
       system: `You are a query parser for a payment dashboard. Convert natural language to filter params.
 Today's date is provided. Amounts in INR but output min_amount/max_amount in paise (×100).
 Dates must be ISO 8601 (YYYY-MM-DD). Only include fields explicitly mentioned.
-Valid statuses: created, authorized, captured, failed, refunded.
-Respond ONLY with valid JSON like: {"status":"captured","from":"2026-04-10","to":"2026-04-17"}`,
+Valid statuses: created, authorized, captured, failed, refunded, blocked.
+Valid risk_action values: allow, review, block. Use risk_action for queries about "risky", "flagged", "under review", "high risk", "suspicious", "blocked by AI" payments.
+Respond ONLY with valid JSON like: {"status":"captured","from":"2026-04-10","to":"2026-04-17"}
+Examples:
+- "show risky payments" → {"risk_action":"review"}
+- "blocked payments" → {"status":"blocked"}
+- "high risk" → {"risk_action":"block"}
+- "payments over 5000 rupees" → {"min_amount":500000}`,
       messages: [{
         role: 'user',
         content: `Today: ${today}\nQuery: "${query}"\nReply with JSON only.`
