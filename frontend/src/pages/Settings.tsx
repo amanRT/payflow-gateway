@@ -157,7 +157,7 @@ export default function Settings() {
         {/* Webhook */}
         <Section title="Webhook Endpoint" subtitle={<>Events posted with <code className="bg-slate-800 text-blue-400 px-1.5 py-0.5 rounded-md font-mono">X-PayFlow-Signature</code> header</>} delay={0.15}>
           <form onSubmit={saveWebhookUrl}>
-            <div className="flex gap-2 mb-3">
+            <div className="flex gap-2 mb-2">
               <input type="url" value={webhookUrl} onChange={e => setWebhookUrl(e.target.value)}
                 placeholder="https://your-server.com/webhooks/payflow"
                 className={inputCls} />
@@ -166,6 +166,11 @@ export default function Settings() {
                 {saving ? <><svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>Saving</> : 'Save'}
               </motion.button>
             </div>
+            <button type="button"
+              onClick={() => setWebhookUrl(`${import.meta.env.VITE_API_URL || 'https://payflow-gateway-production.up.railway.app/api/v1'}/webhooks/receive`)}
+              className="text-xs text-blue-400 hover:text-blue-300 transition-colors mb-3">
+              Use built-in test receiver
+            </button>
             <AnimatePresence>
               {saveStatus === 'success' && (
                 <motion.p initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
@@ -181,6 +186,7 @@ export default function Settings() {
             <p className="text-xs font-semibold text-slate-400 mb-3">Events delivered</p>
             <div className="space-y-2.5">
               {[
+                { event: 'payment.created', desc: 'New payment initiated' },
                 { event: 'payment.captured', desc: 'Payment successfully captured' },
                 { event: 'payment.failed', desc: 'Payment failed' },
                 { event: 'payment.refunded', desc: 'Payment fully or partially refunded' },

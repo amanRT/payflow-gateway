@@ -59,6 +59,11 @@ router.post('/test', jwtAuth, async (req: Request, res: Response) => {
   }
 });
 
+// Built-in test receiver — no auth, just accepts and returns 200
+router.post('/receive', async (_req: Request, res: Response) => {
+  return res.json({ received: true });
+});
+
 router.post('/:id/retry', jwtAuth, async (req: Request, res: Response) => {
   try {
     await retryWebhookDelivery(req.params.id, req.merchantId!);
