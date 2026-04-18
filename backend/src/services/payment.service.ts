@@ -65,14 +65,14 @@ export async function createPayment(input: CreatePaymentInput): Promise<Payment>
   );
 
   if (risk.action === 'block') {
-    await queueWebhookDelivery(id, merchantId, 'payment.blocked', payment!);
+    queueWebhookDelivery(id, merchantId, 'payment.blocked', payment!).catch(() => {});
     throw Object.assign(
       new Error(risk.reason),
       { statusCode: 422, code: 'PAYMENT_BLOCKED', payment: payment! }
     );
   }
 
-  await queueWebhookDelivery(id, merchantId, 'payment.created', payment!);
+  queueWebhookDelivery(id, merchantId, 'payment.created', payment!).catch(() => {});
 
   return payment!;
 }
@@ -101,7 +101,7 @@ export async function capturePayment(paymentId: string, merchantId: string): Pro
     [paymentId]
   );
 
-  await queueWebhookDelivery(paymentId, merchantId, 'payment.captured', updated!);
+  queueWebhookDelivery(paymentId, merchantId, 'payment.captured', updated!).catch(() => {});
 
   return updated!;
 }
@@ -150,7 +150,7 @@ export async function refundPayment(
 
     await client.query('COMMIT');
 
-    await queueWebhookDelivery(paymentId, merchantId, 'payment.refunded', updatedPayment.rows[0]);
+    queueWebhookDelivery(paymentId, merchantId, 'payment.refunded', updatedPayment.rows[0]).catch(() => {});
 
     return { payment: updatedPayment.rows[0], refund: refund.rows[0] };
   } catch (err) {
