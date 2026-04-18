@@ -2,6 +2,12 @@ import { query, queryOne, pool } from '../config/database';
 import { generatePaymentId, generateRefundId } from '../utils/generateId';
 import { queueWebhookDelivery } from './webhook.service';
 import { assessFraudRisk } from './ai.service';
+import { redis } from '../config/redis';
+
+function bustAnalyticsCache(merchantId: string) {
+  redis.del(`analytics:${merchantId}:summary`).catch(() => {});
+  redis.del(`analytics:${merchantId}:daily`).catch(() => {});
+}
 
 export interface Payment {
   id: string;
@@ -64,6 +70,8 @@ export async function createPayment(input: CreatePaymentInput): Promise<Payment>
      risk.action === 'block' ? risk.reason : null]
   );
 
+  bustAnalyticsCache(merchantId);
+
   if (risk.action === 'block') {
     queueWebhookDelivery(id, merchantId, 'payment.blocked', payment!).catch(() => {});
     throw Object.assign(
@@ -101,6 +109,7 @@ export async function capturePayment(paymentId: string, merchantId: string): Pro
     [paymentId]
   );
 
+  bustAnalyticsCache(merchantId);
   queueWebhookDelivery(paymentId, merchantId, 'payment.captured', updated!).catch(() => {});
 
   return updated!;
@@ -150,6 +159,7 @@ export async function refundPayment(
 
     await client.query('COMMIT');
 
+    bustAnalyticsCache(merchantId);
     queueWebhookDelivery(paymentId, merchantId, 'payment.refunded', updatedPayment.rows[0]).catch(() => {});
 
     return { payment: updatedPayment.rows[0], refund: refund.rows[0] };

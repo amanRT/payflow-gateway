@@ -56,19 +56,19 @@ export async function getDailyVolume(merchantId: string): Promise<DailyVolume[]>
 
   const rows = await query<any>(
     `SELECT
-       DATE(created_at AT TIME ZONE 'UTC') AS date,
+       TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD') AS date,
        COALESCE(SUM(amount) FILTER (WHERE status NOT IN ('blocked', 'failed')), 0) AS volume,
        COUNT(*) FILTER (WHERE status NOT IN ('blocked', 'failed')) AS count
      FROM payments
      WHERE merchant_id = $1
        AND created_at >= NOW() - INTERVAL '30 days'
-     GROUP BY DATE(created_at AT TIME ZONE 'UTC')
+     GROUP BY TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD')
      ORDER BY date ASC`,
     [merchantId]
   );
 
   const data: DailyVolume[] = rows.map((r) => ({
-    date: r.date.toISOString().split('T')[0],
+    date: r.date,
     volume: parseInt(r.volume),
     count: parseInt(r.count),
   }));
