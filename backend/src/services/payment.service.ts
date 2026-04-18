@@ -68,6 +68,8 @@ export async function createPayment(input: CreatePaymentInput): Promise<Payment>
     );
   }
 
+  await queueWebhookDelivery(id, merchantId, 'payment.created', payment!);
+
   return payment!;
 }
 
