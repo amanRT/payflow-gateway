@@ -12,6 +12,7 @@ build/
 **/.env
 .env.local
 .env.production
+.INTERVIEW_CONTEXT.md
 
 # Logs
 *.log
