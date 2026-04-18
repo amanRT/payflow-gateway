@@ -1,4 +1,4 @@
-import { useEffect, useState, FormEvent, useRef, useCallback } from 'react';
+import { useEffect, useState, FormEvent, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api, { formatPaise, formatDate, STATUS_COLORS } from '../lib/api';
 import { usePolling } from '../hooks/usePolling';
@@ -305,7 +305,7 @@ export default function Payments() {
   const [nlApplied, setNlApplied] = useState(false);
   const [nlDesc, setNlDesc] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [, setLastUpdated] = useState<Date | null>(null);
   const [newIds, setNewIds] = useState<Set<string>>(new Set());
   const prevIds = useRef<Set<string>>(new Set());
   const [showCreate, setShowCreate] = useState(false);
